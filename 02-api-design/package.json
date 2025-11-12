@@ -1,5 +1,5 @@
 {
-  "name": "01-data-storage-caching",
+  "name": "02-api-design",
   "version": "1.0.0",
   "main": "index.js",
   "type": "module",
@@ -16,7 +16,9 @@
   },
   "dependencies": {
     "express": "^5.1.0",
-    "node-cache": "^5.1.2",
+    "joi": "^18.0.1",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1",
     "uuid": "^13.0.0"
   }
 }
