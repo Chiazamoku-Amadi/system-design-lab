@@ -1,5 +1,5 @@
 {
-  "name": "messages_api",
+  "name": "01-data-storage-caching",
   "version": "1.0.0",
   "main": "index.js",
   "type": "module",

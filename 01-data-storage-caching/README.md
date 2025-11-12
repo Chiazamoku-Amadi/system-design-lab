@@ -30,23 +30,39 @@ It also has an in-memory cache that helps improve response time by serving respo
 
 #### Get All Messages
 
+```
 curl http://localhost:3000/messages
+```
 
 #### Get All Messages With Limit
 
+```
 curl http://localhost:3000/messages?limit=10
+```
 
 #### Get a Single Message
 
-curl http://localhost:3000/messages/:messageId
+```
+curl http://localhost:3000/messages/{messageId}
+```
 
 #### Add a New Message
 
+```
 curl -X POST http://localhost:3000/messages
+```
 
 #### Delete a Message
 
+```
+curl -X DELETE http://localhost:3000/messages/{messageId}
+```
+
+#### Delete all Messages
+
+```
 curl -X DELETE http://localhost:3000/messages
+```
 
 ### Testing Cached and Uncached Response Times
 
@@ -74,12 +90,18 @@ Use the commands below in the following order to test the response times of both
 
 #### Get All Messages
 
+```
 curl -s -w "\nTIME: %{time_total}s\n" http://localhost:3000/messages -o /dev/null
+```
 
 #### Get All Messages With Limit
 
+```
 curl -s -w "\nTIME: %{time_total}s\n" "http://localhost:3000/messages?limit=10" -o /dev/null
+```
 
 #### Add a New Message
 
+```
 curl -s -X POST -H "Content-Type: application/json" -d '{"text":"Hello"}' http://localhost:3000/messages -o /dev/null
+```
