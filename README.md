@@ -34,3 +34,7 @@ Understanding how systems store, access, and expose data efficiently.
 2. **API Design & REST Principles**  
    → Learn to design clean, well-structured REST APIs that follow best practices and standard conventions.  
    _(Involves: routes, controllers, validation, pagination, filtering, error handling.)_
+
+3. **Database Design & Integration**  
+   → Learn how to model data, design normalized relational schemas, and connect backend services to a PostgreSQL database with clarity, security, and performance in mind.  
+   _(Involves: database setup, roles & permissions, environment configuration with .env, establishing connections, entity-relationship modeling, schema design, migrations, connecting Node.js to PostgreSQL using an ORM like Prisma, filtering, search queries, indexing basics, querying data, and testing database-backed API endpoints.)_
