@@ -6,7 +6,7 @@ const statusEnum = ["pending", "in-progress", "completed"];
 export const id = Joi.number().integer().required();
 export const pagination = {
   page: Joi.number().integer().min(1).default(1),
-  limit: Joi.number().integer().min(10).max(20).default(10),
+  limit: Joi.number().integer().min(1).max(100).default(10),
 };
 
 // Create task schema

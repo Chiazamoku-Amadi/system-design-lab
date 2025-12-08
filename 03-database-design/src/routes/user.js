@@ -1,12 +1,12 @@
 import { Router } from "express";
+import prisma from "../prismaClient.js";
+import { AppError } from "../utils/AppError.js";
 import {
   createUserSchema,
   updateUserSchema,
   userIdSchema,
-} from "../validation/schemas/user.schema.js";
-import prisma from "../prismaClient.js";
-import { AppError } from "../utils/AppError.js";
-import { validateRequest } from "../validation/middlewares/validateRequest.js";
+  validateRequest,
+} from "../validation/index.js";
 
 const router = Router();
 
@@ -187,10 +187,12 @@ router.post("/", validateRequest(createUserSchema), async (req, res, next) => {
       },
     });
 
+    const { password: userPassword, ...publicUser } = user;
+
     res.status(201).json({
       status: 201,
       message: "User created successfully",
-      data: user,
+      data: publicUser,
     });
   } catch (error) {
     if (error.code === "P2002") {

@@ -2,7 +2,7 @@ import Joi from "joi";
 
 // Create category schema
 export const createCategorySchema = Joi.object({
-  name: Joi.string(),
+  name: Joi.string().required(),
 });
 
 // Update category schema

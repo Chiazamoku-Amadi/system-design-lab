@@ -32,7 +32,4 @@ process.on("uncaughtException", (err) => {
   process.exit(1);
 });
 
-app.listen(3000, () => {
-  console.log("Server listening on port 3000");
-  console.log("Swagger docs available at http://localhost:3000/api-docs");
-});
+export { app };

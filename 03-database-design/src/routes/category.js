@@ -1,11 +1,12 @@
 import { Router } from "express";
 import prisma from "../prismaClient.js";
-import { validateRequest } from "../validation/middlewares/validateRequest.js";
 import {
   categoryIdSchema,
   createCategorySchema,
   updateCategorySchema,
-} from "../validation/schemas/category.schema.js";
+  validateRequest,
+} from "../validation/index.js";
+import { AppError } from "../utils/AppError.js";
 
 const router = Router();
 
@@ -89,7 +90,7 @@ router.get("/", async (req, res, next) => {
       data: categories,
     });
   } catch (error) {
-    next(AppError(500, "Failed to fetch users"));
+    next(AppError(500, "Failed to fetch categories"));
   }
 });
 
@@ -334,6 +335,9 @@ router.delete(
         message: "Category deleted successfully",
       });
     } catch (error) {
+      if (error.code === "P2025") {
+        return next(AppError(404, "Category not found"));
+      }
       next(AppError(500, "Failed to delete category"));
     }
   }

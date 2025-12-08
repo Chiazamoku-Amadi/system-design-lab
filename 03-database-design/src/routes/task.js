@@ -276,6 +276,23 @@ router.post("/", validateRequest(createTaskSchema), async (req, res, next) => {
   try {
     const { title, description, status, userId, categoryId } = req.body;
 
+    // Check user
+    if (userId) {
+      const userExists = await prisma.user.findUnique({
+        where: { id: userId },
+      });
+      if (!userExists) return next(AppError(400, "User does not exist"));
+    }
+
+    // Check category
+    if (categoryId) {
+      const categoryExists = await prisma.category.findUnique({
+        where: { id: categoryId },
+      });
+      if (!categoryExists)
+        return next(AppError(400, "Category does not exist"));
+    }
+
     const task = await prisma.task.create({
       data: {
         title,
@@ -298,6 +315,11 @@ router.post("/", validateRequest(createTaskSchema), async (req, res, next) => {
       data: task,
     });
   } catch (error) {
+    if (error.code === "P2003") {
+      // Foreign key constraint failed (invalid userId or categoryId)
+      return next(AppError(400, "Invalid userId or categoryId"));
+    }
+
     next(AppError(500, "Failed to create task"));
   }
 });

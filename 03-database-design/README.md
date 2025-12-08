@@ -137,6 +137,136 @@ Install dependencies and start the server:
     npm install
     npm start
 
+### Testing
+
+This project uses Jest, Supertest, and a sandboxed PostgreSQL test database to ensure every part of the system behaves correctly.
+All tests run in full isolation using a dedicated `.env.test` environment.
+
+#### Test Environment Setup
+
+A centralized database lifecycle helper (setupTestDB) ensures each test suite starts with a clean slate:
+
+- Connects to the test DB before running the suite
+- Clears all tables before each test
+- Disconnects Prisma after all tests
+- Prevents data leakage between tests
+
+Supporting utilities include:
+
+- `clearDb()` — deletes all records in the correct dependency order
+- `closeDb()` — safely disconnects Prisma
+- `setup.js` — loads `.env.test` before Prisma initializes
+
+#### Smoke Tests
+
+Basic “is the system alive?” checks ensure:
+
+- Server boots successfully
+- `/api-docs` returns HTML + 200 status
+- `/users`, `/tasks`, `/categories` routes are reachable
+- Invalid JSON bodies return `400 Bad Request`
+- Swagger documentation endpoint is functioning
+
+#### CRUD Tests
+
+Each resource is tested end-to-end using the real Express app and real database.
+
+Users
+
+- Create user
+- Update user
+- Delete user
+- Verify database state using Prisma queries
+
+Categories
+
+- Create category
+- Update category
+- Delete category
+- Validate DB state after deletion
+
+Tasks
+
+- Create task (with real user + category)
+- Update task
+- Delete task
+- Fetch task with joined `user` and `category`
+- Validate created/updated/deleted tasks using Prisma
+
+#### Edge Case & Error Handling Tests
+
+Robust input validation is tested across all entities.
+
+Users
+
+- Missing required fields
+- Invalid email format
+- Invalid ID in params (`/users/abc`)
+- Updating/deleting non-existent user
+- Sending invalid JSON
+
+Categories
+
+- Missing name on creation
+- Invalid category ID
+- Updating/deleting non-existent category
+- Invalid JSON payload
+
+Tasks
+
+- Missing required fields
+- Invalid task status
+- Invalid `userId` format
+- Updating non-existent task
+- Deleting non-existent task
+- Invalid task ID in params (`/tasks/abc`)
+- Invalid JSON payload
+
+#### Integration Tests
+
+A full workflow is tested across Users → Categories → Tasks:
+
+- Create user → create category → create task
+- Retrieve task and verify linked user + category
+- Update task fields together (title, description, status)
+- Deleting a user sets `task.userId = null`
+- Deleting a category sets `task.categoryId = null`
+
+#### Relationship Tests
+
+These tests confirm that relational behavior between Users, Categories, and Tasks works exactly as modeled in the database.
+They verify that deleting a parent record never deletes tasks, but instead safely unlinks them using `ON DELETE SET NULL`.
+
+- Deleting a user sets `task.userId = null`
+- Deleting a category sets `task.categoryId = null`
+- Tasks remain intact after the parent is removed
+- Creating a task with an invalid `userId` or `categoryId` returns a clean `400 Bad Request`
+
+#### Unique Constraint / Concurrency Tests
+
+These tests ensure the system enforces uniqueness at both the API layer and the database layer, protecting the user table from duplicates even under fast or repeated requests.
+
+- Duplicate email detection (`email` must be unique)
+- First request succeeds with `201`
+- Second request returns `400` or `409` depending on Prisma’s error
+- Database contains exactly one record even after two identical create attempts
+
+#### Security & Response Shape Tests
+
+These tests ensure the API never leaks sensitive fields and always responds in a safe, predictable format.
+
+- Passwords are never returned in API responses on user creation
+- Returned user object includes only safe fields (`id`, `name`, `email`)
+- Error responses strictly follow the { `message: string` } convention across all cases
+
+#### Running the Test Suite
+
+```
+npm test
+```
+
+This command automatically loads `.env.test`, runs migrations, and executes all Jest suites in `tests/`.
+
 ### Testing the API Using Curl
 
 #### Users
