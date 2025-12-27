@@ -4,16 +4,20 @@
 
 ### Task Management API
 
-This version of the Task Management API builds on Challenge 3, adding scalability, load balancing, and performance enhancements to handle more users and concurrent traffic.
+This challenge takes the database-backed Task Management API from Week 3 and scales it. The API itself stays the same, but the infrastructure evolves into something production-minded and resilient.
 
-The API itself hasn’t fundamentally changed, but the infrastructure and design patterns now reflect real-world distributed systems.
+Here, I explored how real systems handle traffic when users multiply. Instead of one lonely server doing all the work, multiple API instances run side-by-side, with a load balancer orchestrating the flow. Redis joins the architecture as a high-speed memory layer, helping offload read-heavy traffic from PostgreSQL. And the app becomes fully stateless — meaning any server can answer any request at any time.
 
-Key improvements:
+This is where the system stops being a project and starts becoming an ecosystem.
+
+### Key improvements:
 
 - Horizontal scaling: multiple API instances running on different ports.
-- Load balancing using NGINX to distribute requests evenly.
-- Redis caching for high-read endpoints (GET /tasks).
+- NGINX load balancing: requests distributed evenly in round-robin style
+- Redis caching: GET `/tasks` is cached to reduce database pressure
 - Stateless API design: all persistent and ephemeral state lives in PostgreSQL and Redis.
+
+Every instance becomes interchangeable. No server “remembers.”
 
 ### Technologies & Tools
 
@@ -67,30 +71,126 @@ http {
 - Requests are evenly distributed across multiple API instances.
 - Logs in each instance confirm requests are being handled by different ports.
 
-### Caching
+### Traffic Simulation: Single Instance vs Load Balanced
 
-Redis is used to offload read-heavy endpoints, particularly GET /tasks:
+Using hey, I simulated traffic with:
 
-- Cached results reduce database load under high concurrency.
-- Cache is invalidated when tasks are created, updated, or deleted.
+```
+200 requests
+20 concurrent users
+```
 
-Example flow:
+From the report summaries, histograms, and percentile distributions, I observed:
 
-- Client requests GET /tasks.
-- API checks Redis cache:
-  - If cached → return cached response.
-  - If not → fetch from PostgreSQL, store result in Redis, then return.
+- The server handled requests quickly for most users
+- But a small latency tail appeared, a reminder that scaling is about the outliers, not the average
+- All requests returned 200 OK, confirming reliability
+
+This helped set the stage for load balancing.
+
+### Load Balancing with NGINX
+
+After configuring NGINX to distribute requests to multiple API instances, I repeated load testing.
+
+#### Outcome
+
+- Throughput changed
+- Average latency shifted
+- The database became the bottleneck — not the API. This was the biggest insight
+
+Because:
+
+- Multiple app servers → more parallel DB calls
+- NGINX fans traffic out
+- PostgreSQL absorbs the pressure
+- Response wait time rises
+
+What I learned:
+
+- Scaling APIs doesn’t magically scale databases.
+- Load balancers add overhead.
+- Real scaling means designing the whole system, not just the server.
+
+### Redis Caching — Before vs After
+
+To reduce DB strain, I identified `/tasks` as a high-read endpoint and layered Redis on top.
+
+Then I tested performance using:
+
+```
+hey -n 500 -c 50 http://localhost:3000/tasks
+```
+
+#### Run #1 (Cold Cache)
+
+- Average latency: ~ 64 ms
+- Requests/sec: ~ 758 req/sec
+
+Latency tail (90th–99th percentile):
+
+- 0.40–0.48 seconds
+
+This is the cache warming phase — Redis is filling up.
+
+#### Run #2 (Warm Cache)
+
+- Average latency: ~ 20 ms
+- Requests/sec: ~ 2400 req/sec
+
+Tight latency spread:
+
+- 50% completed ~ 19 ms
+- 90% completed ~ 23 ms
+- 99% under 40 ms
+
+Translation:
+Once cached, the API barely had to think; it just streamed bytes from memory.
+
+All 500 requests returned 200 OK. Zero failures.
+
+### Cache Invalidation
+
+To keep data fresh:
+
+- POST /tasks
+- PUT /tasks/:id
+- DELETE /tasks/:id
+
+→ trigger cache invalidation
+
+So Redis always reflects the real world.
 
 ### Stateless Design
 
-All critical state is externalized:
+The API now stores:
 
-- No in-memory storage of tasks.
-- Persistent state in PostgreSQL.
-- Ephemeral, high-read state in Redis.
-- Any instance can serve requests independently.
+- Persistent data → PostgreSQL
+- Ephemeral / high-speed data → Redis
+- Nothing critical in memory
 
-This allows horizontal scaling without data inconsistency.
+Meaning:
+
+- Any server can handle any request
+- Scaling becomes plug-and-play
+- No node affinity
+
+If 10 instances spin up:
+
+- They share Redis + Postgres
+- No instance is special
+- No instance remembers
+
+### Load Balancing Validation
+
+NGINX distributes traffic in round-robin, confirmed via request logs.
+
+Result:
+
+- Load spreads across instances
+- System resilience improves
+- Performance stabilizes under concurrency
+
+Not just fast, but graceful under pressure.
 
 ### Load Testing
 
