@@ -44,27 +44,25 @@ Multiple instances of the API run on separate ports:
 
 NGINX acts as the traffic conductor, listening on port 8080 and distributing requests to backend servers in round-robin fashion:
 
-```
-events {}
+#### nginx.example.conf
 
-http {
-  upstream task_api {
-    server localhost:3001;
-    server localhost:3002;
-    server localhost:3003;
-  }
+This is a sample NGINX config file used for load-balancing the Task API.
+On my local setup, NGINX is installed as a system service (Tools/nginx/conf), so the real config file lives outside this repo.
 
-  server {
-    listen 8080;
+If you want to run this project with NGINX:
 
-    location / {
-      proxy_pass http://task_api;
-      proxy_set_header Host $host;
-      proxy_set_header X-Forwarded-For $remote_addr;
-    }
-  }
-}
-```
+- Copy this file into your NGINX config folder
+- Rename it to `nginx.conf` (or include it from your main config)
+- Start NGINX as admin
+- Access the API through `http://localhost:8080`
+
+NGINX will forward requests to:
+
+- "`localhost:3001`"
+- "`localhost:3002`"
+- "`localhost:3003`"
+
+…providing round-robin load balancing.
 
 #### Notes
 
