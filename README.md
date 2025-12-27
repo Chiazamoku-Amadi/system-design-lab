@@ -35,6 +35,14 @@ Understanding how systems store, access, and expose data efficiently.
    → Learn to design clean, well-structured REST APIs that follow best practices and standard conventions.  
    _(Involves: routes, controllers, validation, pagination, filtering, error handling.)_
 
-3. **Database Design & Integration**  
+3. **Database Modeling & Query Optimization**  
    → Learn how to model data, design normalized relational schemas, and connect backend services to a PostgreSQL database with clarity, security, and performance in mind.  
    _(Involves: database setup, roles & permissions, environment configuration with .env, establishing connections, entity-relationship modeling, schema design, migrations, connecting Node.js to PostgreSQL using an ORM like Prisma, filtering, search queries, indexing basics, querying data, and testing database-backed API endpoints.)_
+
+### **Phase 2: System Design Core (Weeks 4–7)**
+
+Designing systems that don’t just work — but keep working beautifully as traffic grows.
+
+4. **Scalability & Load Balancing**  
+   → Learn how to evolve a single-instance backend into a distributed system that can handle real-world traffic without breaking a sweat.  
+   _(Involves: running multiple API instances, horizontal scaling, configuring NGINX as a load balancer, Redis caching for high-read endpoints, ensuring stateless service design, and performance testing to observe how the system behaves under concurrent load.)_
