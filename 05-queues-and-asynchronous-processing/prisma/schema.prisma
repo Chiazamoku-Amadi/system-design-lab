@@ -1,0 +1,59 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider   = "prisma-client-js"
+  output     = "../src/generated/prisma"
+  engineType = "client"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id          Int          @id @default(autoincrement())
+  email       String       @unique
+  name        String?
+  password    String
+  tasks       Task[]
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+}
+
+model Category {
+  id          Int          @id @default(autoincrement())
+  name        String
+  tasks       Task[]
+  createdAt   DateTime     @default(now())
+}
+
+model Task {
+  id           Int         @id @default(autoincrement())
+  title        String
+  description  String?
+  status       String      @default("pending")
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  @@index([title])
+
+  // Relationships
+  userId       Int?
+  user         User?       @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  categoryId   Int?
+  category     Category?   @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+}
+
+model ProcessedMessage {
+  id           Int         @id @default(autoincrement())
+  messageId    String      @unique
+  type         String?
+  processedAt  DateTime    @default(now())
+
+  @@index([processedAt])
+}

@@ -46,3 +46,7 @@ Designing systems that don’t just work — but keep working beautifully as tra
 4. **Scalability & Load Balancing**  
    → Learn how to evolve a single-instance backend into a distributed system that can handle real-world traffic without breaking a sweat.  
    _(Involves: running multiple API instances, horizontal scaling, configuring NGINX as a load balancer, Redis caching for high-read endpoints, ensuring stateless service design, and performance testing to observe how the system behaves under concurrent load.)_
+
+5. **Queues & Asynchronous Processing**  
+   → Learn how to decouple work from the main request lifecycle, enabling background processing, retries, and resilient event-driven flows.  
+   _(Involves: setting up RabbitMQ as a message broker, producing events from the API, building worker processes to consume events, implementing retry logic and dead-letter queues, ensuring idempotent processing, validating event payloads with a schema, tracking processed messages in PostgreSQL using Prisma, and scaling workers horizontally.)_

@@ -1,0 +1,14 @@
+import { connectRedis } from "./config/redis.js";
+import { app } from "./index.js";
+
+const PORT = process.env.PORT || 3000;
+
+const startServer = async () => {
+  await connectRedis();
+  app.listen(PORT, () => {
+    console.log(`Server listening on port ${PORT}`);
+    console.log(`Swagger docs available at http://localhost:${PORT}/api-docs`);
+  });
+};
+
+startServer();
