@@ -50,3 +50,7 @@ Designing systems that don’t just work — but keep working beautifully as tra
 5. **Queues & Asynchronous Processing**  
    → Learn how to decouple work from the main request lifecycle, enabling background processing, retries, and resilient event-driven flows.  
    _(Involves: setting up RabbitMQ as a message broker, producing events from the API, building worker processes to consume events, implementing retry logic and dead-letter queues, ensuring idempotent processing, validating event payloads with a schema, tracking processed messages in PostgreSQL using Prisma, and scaling workers horizontally.)_
+
+6. **Rate Limiting & Fault Tolerance**  
+   → Learn how to protect backend services from abuse, overload, and partial failures while ensuring safe retries and predictable behaviour under concurrency.  
+   _(Involves: implementing route-based rate limiting with different limits for reads and writes, handling request timeouts to prevent stalled connections, adding retries with exponential backoff for transient failures, introducing graceful fallbacks when dependencies like Redis fail, and enforcing idempotency for write operations to prevent duplicate side effects during retries or concurrent requests.)_
